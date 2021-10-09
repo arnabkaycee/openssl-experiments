@@ -49,6 +49,24 @@ rc2-cfb           rc2-ecb           rc2-ofb           rc4
 rc4-40
 ```
 
+Overwhelming? Refer to the concise table required for this tutorial
+
+|Option|Description|
+|------|-----------|
+|[enc](https://www.openssl.org/docs/man1.1.1/man1/enc.html)|encryption, decryption, encoding and decoding (Symmetric encryption using AES algorithm)|
+|[genpkey](https://www.openssl.org/docs/man1.1.1/man1/genpkey.html)|generate private key (using specified algorithm, ECDSA or RSA)|
+|[pkey](https://www.openssl.org/docs/man1.1.1/man1/pkey.html)|process private and public keys|
+|[dgst](https://www.openssl.org/docs/man1.1.1/man1/dgst.html)|digest using specified algorithm|
+|[rsautl](https://www.openssl.org/docs/man1.1.1/man1/rsautl.html)|operations using RSA algorithm (asymmetric),like sign, verify, encrypt and decrypt using the RSA algorithm|
+|[ecparam](https://www.openssl.org/docs/man1.1.1/man1/ecparam.html)|operations using ECDA curves using its parameters files|
+|[genrsa](https://www.openssl.org/docs/man1.1.1/man1/genrsa.html)|generation of keys using RSA, superseded by `genpkey`|
+|[req](https://www.openssl.org/docs/man1.1.1/man1/req.html)|creation of certificate and processes certificate requests|
+|[x509](https://www.openssl.org/docs/man1.1.1/man1/x509.html)|operations for x509 type of certificates, like viewing, conversion, sign CSRs, edit certificate settings|
+|[ca](https://www.openssl.org/docs/manmaster/man1/openssl-ca.html)|certificate authority operations (including generation of CSR, CRL, Approval)|
+|[verify](https://www.openssl.org/docs/man1.1.1/man1/verify.html)|Verifies certificate chains|
+|[crl](https://www.openssl.org/docs/man1.1.1/man1/crl.html)|Certification revocation management|
+
+
 ## Hashing
 
 ```shell
