@@ -2,3 +2,5 @@
 **/*.attr
 **/*.old
 **/serial
+**/*.dat
+**/*.sha*

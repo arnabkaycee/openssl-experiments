@@ -10,6 +10,45 @@ Note:
 > 
 > The private keys stored hera are for demonstration purposes. Do not use any of the keys for any other purposes other than learning
 
+
+## Options for `openssl`
+
+```
+Standard commands
+asn1parse         ca                certhash          ciphers
+crl               crl2pkcs7         dgst              dh
+dhparam           dsa               dsaparam          ec
+ecparam           enc               errstr            gendh
+gendsa            genpkey           genrsa            nseq
+ocsp              passwd            pkcs12            pkcs7
+pkcs8             pkey              pkeyparam         pkeyutl
+prime             rand              req               rsa
+rsautl            s_client          s_server          s_time
+sess_id           smime             speed             spkac
+ts                verify            version           x509
+
+Message Digest commands (see the `dgst' command for more details)
+gost-mac          md4               md5               md_gost94
+ripemd160         sha1              sha224            sha256
+sha384            sha512            streebog256       streebog512
+whirlpool
+
+Cipher commands (see the `enc' command for more details)
+aes-128-cbc       aes-128-ecb       aes-192-cbc       aes-192-ecb
+aes-256-cbc       aes-256-ecb       base64            bf
+bf-cbc            bf-cfb            bf-ecb            bf-ofb
+camellia-128-cbc  camellia-128-ecb  camellia-192-cbc  camellia-192-ecb
+camellia-256-cbc  camellia-256-ecb  cast              cast-cbc
+cast5-cbc         cast5-cfb         cast5-ecb         cast5-ofb
+chacha            des               des-cbc           des-cfb
+des-ecb           des-ede           des-ede-cbc       des-ede-cfb
+des-ede-ofb       des-ede3          des-ede3-cbc      des-ede3-cfb
+des-ede3-ofb      des-ofb           des3              desx
+rc2               rc2-40-cbc        rc2-64-cbc        rc2-cbc
+rc2-cfb           rc2-ecb           rc2-ofb           rc4
+rc4-40
+```
+
 ## Hashing
 
 ```shell
@@ -60,7 +99,7 @@ Options for `dgst` are:
 
 ## Encryption and Decryption
 
-### Symmetric Encryption
+### Symmetric Encryption (Using AES)
 
 Encryption using `aes-128-cbc` & `aes-256-cbc` algorithm
 
@@ -76,7 +115,52 @@ $ openssl enc -aes-128-cbc -d -in randomfile_enc.txt -out randomfile_dec.txt
 $ openssl enc -aes-256-cbc -d -in randomfile_enc.txt -out randomfile_dec_aes256cbc.txt
 ```
 
-### Asymmetric Encryption
+### Asymmetric Encryption (Using RSA)
+
+Generate RSA private key of 2048 bits
+
+```shell
+# generate without password
+$ openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private-key.pem
+
+#generate with password
+$ openssl genpkey -aes256 -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private-key-passwd.pem
+```
+
+Generate public key corresponding to the private key
+
+```shell
+openssl pkey -in public-key.pem -pubin -text
+```
+
+### Signature & Verification of data
+
+```bash
+# generate the hash of the data 
+$ openssl dgst -sha256 data.txt > hash.txt
+
+# generate the signature and store in a file
+$ openssl rsautl -sign -inkey private-key.pem -keyform PEM -in hash.txt > signed.dat
+
+# verify the signature of the data
+
+$ HASH=$(openssl rsautl -verify -inkey public-key.pem -pubin -keyform PEM -in signed.dat)
+$ [[ "$HASH" = "$(cat hash.txt)" ]] && echo 'sig matched' || echo "didn't match"
+```
+
+Alternate one liner approach without the script
+
+```shell
+$ openssl dgst -sha256 -sign private-key.pem -out somefile.sha256 randomfile.txt
+$ openssl dgst -sha256 -verify public-key.pem -signature somefile.sha256 randomfile.txt
+# in case of success: prints "Verified OK"
+# in case of failure: prints "Verification Failure", return code 1
+
+```
+
+
+
+### ECDSA Asymmetric Key Management
 
 Generate Elliptic Curve of `secp256k1` type
 
@@ -94,14 +178,8 @@ Generate the public key from the private key above
 $ openssl pkey -in private_key.pem -out public-key.pem -pubout
 ```
 
-Alternate direct way
-```shell
-# generate private key
-$ openssl ecparam -name prime256v1 -genkey -noout -out private_key_direct.pem
+> Using ECDSA keys for encryption with Openssl is not well documented and not well resourced. I will update this section on more updates.
 
-# generate corresponding public key
-$ openssl ec -in private_key_direct.pem -pubout -out public_key_direct.pem
-```
 
 # PART 2
 
@@ -133,3 +211,5 @@ https://jamielinux.com/docs/openssl-certificate-authority/index.html
 3. https://www.openssl.org/docs/man1.1.0/man1/genpkey.html
 4. https://www.scottbrady91.com/openssl/creating-elliptical-curve-keys-using-openssl
 5. https://www.ibm.com/support/pages/openssl-commands-check-and-verify-your-ssl-certificate-key-and-csr
+6. https://www.feistyduck.com/library/openssl-cookbook/online/ch-openssl.html
+7. https://stackoverflow.com/questions/10782826/digital-signature-for-a-file-using-openssl
